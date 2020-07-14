@@ -226,7 +226,7 @@ resource "null_resource" "nullremote3"  {
 	}
 }
 
-# -- Staring chrome for output
+# -- Starting chrome for output
 
 resource "null_resource" "nulllocal1"  {
 	depends_on = [
