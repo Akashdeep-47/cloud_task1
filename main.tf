@@ -3,6 +3,8 @@ provider "aws" {
 	profile = "sky"
 }
 
+# -- Creating Key pairs
+
 resource "tls_private_key" "key1" {
 	algorithm = "RSA"
 	rsa_bits = 4096
@@ -18,6 +20,8 @@ resource "aws_key_pair" "key3" {
 	key_name = "task1_key"
 	public_key = "${tls_private_key.key1.public_key_openssh}"
 }
+
+# -- Creating Security Groups
 
 resource "aws_security_group" "sg" {
 	name        = "task1-sg"
@@ -53,8 +57,10 @@ resource "aws_security_group" "sg" {
   	}
 }
 
+# -- Creating Ec2 instance
+
 resource "aws_instance" "web_server" {
-  	ami           = "ami-0447a12f28fddb066"
+  	ami = "ami-0447a12f28fddb066"
   	instance_type = "t2.micro"
  	subnet_id = "subnet-adead0c5"
 	availability_zone = "ap-south-1a"
@@ -86,6 +92,8 @@ resource "aws_instance" "web_server" {
 
 }
 
+# -- Creating EBS volume
+
 resource "aws_ebs_volume" "task1_ebs" {
   	availability_zone = "ap-south-1a" 
   	size = 1
@@ -95,6 +103,8 @@ resource "aws_ebs_volume" "task1_ebs" {
   	}
 }
 
+
+# -- Mounting the ebs volume
 
 resource "aws_volume_attachment" "task1_ebs_mount" {
   	device_name = "/dev/xvds"
@@ -120,6 +130,8 @@ resource "aws_volume_attachment" "task1_ebs_mount" {
 	  }
 }
 
+# -- Creating S3 Bucket
+
 resource "aws_s3_bucket" "mybucket"{
 	bucket = "sky25"
 	acl = "public-read"
@@ -134,6 +146,8 @@ resource "aws_s3_bucket" "mybucket"{
 	}
 }
 
+# -- Uploading files in S3 bucket
+
 resource "aws_s3_bucket_object" "file_upload" {
 	depends_on = [
     		aws_s3_bucket.mybucket,
@@ -143,6 +157,8 @@ resource "aws_s3_bucket_object" "file_upload" {
   	source = "cloud_task1/pic.jpg"
 	acl ="public-read"
 }
+
+# -- Creating CloudFront
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
 	depends_on = [
@@ -188,6 +204,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   	}		
 }
 
+# -- Updating file to main lacation 
 
 resource "null_resource" "nullremote3"  {
 	depends_on = [
@@ -208,6 +225,8 @@ resource "null_resource" "nullremote3"  {
     		]
 	}
 }
+
+# -- Staring chrome for output
 
 resource "null_resource" "nulllocal1"  {
 	depends_on = [
